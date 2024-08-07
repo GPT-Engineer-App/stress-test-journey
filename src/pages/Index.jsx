@@ -1,13 +1,16 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Cat, Info, Paw, Facebook, Twitter, Instagram, Heart, ChevronDown } from "lucide-react";
+import { Cat, Info, Paw, Facebook, Twitter, Instagram, Heart, ChevronDown, Star, Zap, Music } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/components/ui/use-toast";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const catImages = [
   "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg",
@@ -15,12 +18,37 @@ const catImages = [
   "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Kittyply_edit1.jpg/1200px-Kittyply_edit1.jpg",
 ];
 
+const catFacts = [
+  { badge: "Vision", fact: "Cats have excellent night vision and can see at one-sixth the light level required for human vision." },
+  { badge: "Group", fact: "A group of cats is called a 'clowder'." },
+  { badge: "Sleep", fact: "Cats spend 70% of their lives sleeping." },
+  { badge: "Hearing", fact: "A cat's hearing is much more sensitive than humans and dogs." },
+  { badge: "Whiskers", fact: "Cat whiskers are the same width as their body, helping them navigate tight spaces." },
+  { badge: "Purring", fact: "Cats purr at a frequency of 25 to 150 Hertz, which can promote bone density and healing." },
+];
+
+const catBreeds = [
+  { breed: "Siamese", description: "Known for their distinctive coloring and vocal nature." },
+  { breed: "Maine Coon", description: "One of the largest domesticated cat breeds with a distinctive physical appearance." },
+  { breed: "Persian", description: "Recognized for their long fur and flat faces." },
+  { breed: "Bengal", description: "A hybrid breed with a wild appearance resembling leopards." },
+  { breed: "Sphynx", description: "Famous for their lack of fur and wrinkled skin." },
+  { breed: "Scottish Fold", description: "Characterized by their folded ears and round faces." },
+];
+
 const Index = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [quizStarted, setQuizStarted] = useState(false);
   const [quizScore, setQuizScore] = useState(0);
   const [likeCount, setLikeCount] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolume] = useState(50);
+  const audioRef = useRef(null);
+  const { scrollYProgress } = useScroll();
   const { toast } = useToast();
+
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0.8]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -28,6 +56,12 @@ const Index = () => {
     }, 5000);
     return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume / 100;
+    }
+  }, [volume]);
 
   const startQuiz = () => {
     setQuizStarted(true);
@@ -46,9 +80,21 @@ const Index = () => {
     });
   };
 
+  const togglePlay = () => {
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-200 to-pink-200">
-      <div className="relative h-screen flex items-center justify-center overflow-hidden">
+      <motion.div 
+        className="relative h-screen flex items-center justify-center overflow-hidden"
+        style={{ opacity, scale }}
+      >
         <AnimatePresence mode="wait">
           <motion.img
             key={currentImageIndex}
@@ -105,6 +151,42 @@ const Index = () => {
             >
               <Heart className="mr-2 h-4 w-4" /> Like ({likeCount})
             </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="text-white border-white hover:bg-white/20 transition-colors duration-300"
+                >
+                  <Star className="mr-2 h-4 w-4" /> Subscribe
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Subscribe to Cat Facts</DialogTitle>
+                  <DialogDescription>
+                    Get daily cat facts delivered to your inbox!
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="name" className="text-right">
+                      Name
+                    </Label>
+                    <Input id="name" className="col-span-3" />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="email" className="text-right">
+                      Email
+                    </Label>
+                    <Input id="email" className="col-span-3" />
+                  </div>
+                </div>
+                <DialogTrigger asChild>
+                  <Button type="submit" className="bg-purple-600 hover:bg-purple-700">Subscribe</Button>
+                </DialogTrigger>
+              </DialogContent>
+            </Dialog>
           </motion.div>
         </motion.div>
         <motion.div
@@ -118,7 +200,7 @@ const Index = () => {
             onClick={() => document.getElementById('content').scrollIntoView({ behavior: 'smooth' })}
           />
         </motion.div>
-      </div>
+      </motion.div>
 
       <div id="content" className="max-w-6xl mx-auto p-8">
         <motion.div
@@ -127,7 +209,7 @@ const Index = () => {
           transition={{ duration: 0.5 }}
         >
           <Tabs defaultValue="facts" className="mb-12">
-            <TabsList className="grid w-full grid-cols-2 mb-8">
+            <TabsList className="grid w-full grid-cols-3 mb-8">
               <TabsTrigger value="facts" className="text-lg">
                 <Info className="mr-2 h-5 w-5" />
                 Feline Facts
@@ -135,6 +217,10 @@ const Index = () => {
               <TabsTrigger value="breeds" className="text-lg">
                 <Paw className="mr-2 h-5 w-5" />
                 Cat Breeds
+              </TabsTrigger>
+              <TabsTrigger value="music" className="text-lg">
+                <Music className="mr-2 h-5 w-5" />
+                Cat Music
               </TabsTrigger>
             </TabsList>
             <TabsContent value="facts">
@@ -146,12 +232,7 @@ const Index = () => {
                 <CardContent className="p-6">
                   <Carousel className="w-full max-w-xs mx-auto">
                     <CarouselContent>
-                      {[
-                        { badge: "Vision", fact: "Cats have excellent night vision and can see at one-sixth the light level required for human vision." },
-                        { badge: "Group", fact: "A group of cats is called a 'clowder'." },
-                        { badge: "Sleep", fact: "Cats spend 70% of their lives sleeping." },
-                        { badge: "Hearing", fact: "A cat's hearing is much more sensitive than humans and dogs." },
-                      ].map((item, index) => (
+                      {catFacts.map((item, index) => (
                         <CarouselItem key={index}>
                           <div className="p-1">
                             <Card>
@@ -181,12 +262,7 @@ const Index = () => {
                 <CardContent className="p-6">
                   <Carousel className="w-full max-w-xs mx-auto">
                     <CarouselContent>
-                      {[
-                        { breed: "Siamese", description: "Known for their distinctive coloring and vocal nature." },
-                        { breed: "Maine Coon", description: "One of the largest domesticated cat breeds with a distinctive physical appearance." },
-                        { breed: "Persian", description: "Recognized for their long fur and flat faces." },
-                        { breed: "Bengal", description: "A hybrid breed with a wild appearance resembling leopards." },
-                      ].map((item, index) => (
+                      {catBreeds.map((item, index) => (
                         <CarouselItem key={index}>
                           <div className="p-1">
                             <Card>
@@ -204,6 +280,40 @@ const Index = () => {
                     <CarouselPrevious />
                     <CarouselNext />
                   </Carousel>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            <TabsContent value="music">
+              <Card className="overflow-hidden">
+                <CardHeader className="bg-gradient-to-r from-blue-500 to-green-500 text-white">
+                  <CardTitle className="text-2xl">Relaxing Cat Music</CardTitle>
+                  <CardDescription className="text-gray-200">Soothing tunes for your feline friends</CardDescription>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="flex flex-col items-center space-y-4">
+                    <Button
+                      onClick={togglePlay}
+                      className="bg-green-500 hover:bg-green-600 transition-colors duration-300"
+                    >
+                      {isPlaying ? "Pause" : "Play"}
+                    </Button>
+                    <div className="flex items-center space-x-2">
+                      <Zap className="h-4 w-4" />
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={volume}
+                        onChange={(e) => setVolume(e.target.value)}
+                        className="w-full"
+                      />
+                    </div>
+                    <audio
+                      ref={audioRef}
+                      src="https://example.com/cat-music.mp3"
+                      loop
+                    />
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
