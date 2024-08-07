@@ -4,9 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Cat, Info, Paw, Facebook, Twitter, Instagram, Heart } from "lucide-react";
+import { Cat, Info, Paw, Facebook, Twitter, Instagram, Heart, ChevronDown } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/components/ui/use-toast";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 const catImages = [
   "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg",
@@ -67,11 +68,28 @@ const Index = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.5 }}
         >
-          <h1 className="text-7xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
+          <motion.h1 
+            className="text-7xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600"
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 1 }}
+          >
             Fascinating Felines
-          </h1>
-          <p className="text-2xl mb-8 text-gray-200">Discover the wonderful world of cats</p>
-          <div className="flex justify-center space-x-4">
+          </motion.h1>
+          <motion.p 
+            className="text-2xl mb-8 text-gray-200"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 1.2 }}
+          >
+            Discover the wonderful world of cats
+          </motion.p>
+          <motion.div 
+            className="flex justify-center space-x-4"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 1.4 }}
+          >
             <Button
               size="lg"
               className="bg-purple-600 hover:bg-purple-700 transition-colors duration-300"
@@ -87,7 +105,18 @@ const Index = () => {
             >
               <Heart className="mr-2 h-4 w-4" /> Like ({likeCount})
             </Button>
-          </div>
+          </motion.div>
+        </motion.div>
+        <motion.div
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 2 }}
+        >
+          <ChevronDown 
+            className="w-12 h-12 text-white animate-bounce cursor-pointer" 
+            onClick={() => document.getElementById('content').scrollIntoView({ behavior: 'smooth' })}
+          />
         </motion.div>
       </div>
 
@@ -115,25 +144,31 @@ const Index = () => {
                   <CardDescription className="text-gray-200">Discover the wonders of our purr-fect companions</CardDescription>
                 </CardHeader>
                 <CardContent className="p-6">
-                  <ul className="space-y-6">
-                    {[
-                      { badge: "Vision", fact: "Cats have excellent night vision and can see at one-sixth the light level required for human vision." },
-                      { badge: "Group", fact: "A group of cats is called a 'clowder'." },
-                      { badge: "Sleep", fact: "Cats spend 70% of their lives sleeping." },
-                      { badge: "Hearing", fact: "A cat's hearing is much more sensitive than humans and dogs." },
-                    ].map((item, index) => (
-                      <motion.li
-                        key={index}
-                        className="flex items-center bg-gray-100 rounded-lg p-4 shadow-md"
-                        initial={{ opacity: 0, x: -50 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5, delay: index * 0.1 }}
-                      >
-                        <Badge variant="secondary" className="mr-3 text-lg py-1 px-3">{item.badge}</Badge>
-                        <span className="text-gray-700">{item.fact}</span>
-                      </motion.li>
-                    ))}
-                  </ul>
+                  <Carousel className="w-full max-w-xs mx-auto">
+                    <CarouselContent>
+                      {[
+                        { badge: "Vision", fact: "Cats have excellent night vision and can see at one-sixth the light level required for human vision." },
+                        { badge: "Group", fact: "A group of cats is called a 'clowder'." },
+                        { badge: "Sleep", fact: "Cats spend 70% of their lives sleeping." },
+                        { badge: "Hearing", fact: "A cat's hearing is much more sensitive than humans and dogs." },
+                      ].map((item, index) => (
+                        <CarouselItem key={index}>
+                          <div className="p-1">
+                            <Card>
+                              <CardContent className="flex aspect-square items-center justify-center p-6">
+                                <div className="text-center">
+                                  <Badge variant="secondary" className="mb-2 text-lg py-1 px-3">{item.badge}</Badge>
+                                  <p className="text-sm text-gray-700">{item.fact}</p>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          </div>
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    <CarouselPrevious />
+                    <CarouselNext />
+                  </Carousel>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -144,25 +179,31 @@ const Index = () => {
                   <CardDescription className="text-gray-200">Explore the diverse world of feline varieties</CardDescription>
                 </CardHeader>
                 <CardContent className="p-6">
-                  <ul className="space-y-6">
-                    {[
-                      { breed: "Siamese", description: "Known for their distinctive coloring and vocal nature." },
-                      { breed: "Maine Coon", description: "One of the largest domesticated cat breeds with a distinctive physical appearance." },
-                      { breed: "Persian", description: "Recognized for their long fur and flat faces." },
-                      { breed: "Bengal", description: "A hybrid breed with a wild appearance resembling leopards." },
-                    ].map((item, index) => (
-                      <motion.li
-                        key={index}
-                        className="flex items-center bg-gray-100 rounded-lg p-4 shadow-md"
-                        initial={{ opacity: 0, x: 50 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5, delay: index * 0.1 }}
-                      >
-                        <Badge className="mr-3 text-lg py-1 px-3">{item.breed}</Badge>
-                        <span className="text-gray-700">{item.description}</span>
-                      </motion.li>
-                    ))}
-                  </ul>
+                  <Carousel className="w-full max-w-xs mx-auto">
+                    <CarouselContent>
+                      {[
+                        { breed: "Siamese", description: "Known for their distinctive coloring and vocal nature." },
+                        { breed: "Maine Coon", description: "One of the largest domesticated cat breeds with a distinctive physical appearance." },
+                        { breed: "Persian", description: "Recognized for their long fur and flat faces." },
+                        { breed: "Bengal", description: "A hybrid breed with a wild appearance resembling leopards." },
+                      ].map((item, index) => (
+                        <CarouselItem key={index}>
+                          <div className="p-1">
+                            <Card>
+                              <CardContent className="flex aspect-square items-center justify-center p-6">
+                                <div className="text-center">
+                                  <Badge className="mb-2 text-lg py-1 px-3">{item.breed}</Badge>
+                                  <p className="text-sm text-gray-700">{item.description}</p>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          </div>
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    <CarouselPrevious />
+                    <CarouselNext />
+                  </Carousel>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -183,21 +224,43 @@ const Index = () => {
             </CardHeader>
             <CardContent>
               {!quizStarted ? (
-                <div className="text-center">
+                <motion.div 
+                  className="text-center"
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
                   <p className="text-xl mb-6">Are you the ultimate cat expert? Test your feline knowledge!</p>
-                  <Button onClick={startQuiz} size="lg" className="bg-white text-purple-600 hover:bg-gray-100">
+                  <Button 
+                    onClick={startQuiz} 
+                    size="lg" 
+                    className="bg-white text-purple-600 hover:bg-gray-100 transition-all duration-300 transform hover:scale-105"
+                  >
                     Start Quiz
                   </Button>
-                </div>
+                </motion.div>
               ) : (
-                <div className="text-center">
+                <motion.div 
+                  className="text-center"
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
                   <p className="text-xl mb-4">Quiz in progress... Meow-velous job!</p>
                   <p className="text-lg mb-2">Your current score:</p>
                   <div className="flex items-center justify-center">
                     <Progress value={quizScore} className="w-64 h-3 bg-purple-300" />
-                    <span className="ml-4 text-2xl font-bold">{quizScore}%</span>
+                    <motion.span 
+                      className="ml-4 text-2xl font-bold"
+                      key={quizScore}
+                      initial={{ scale: 1.5, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      {quizScore}%
+                    </motion.span>
                   </div>
-                </div>
+                </motion.div>
               )}
             </CardContent>
           </Card>
@@ -211,15 +274,25 @@ const Index = () => {
         >
           <p className="text-lg mb-4">Follow us for more purr-fect content:</p>
           <div className="flex justify-center space-x-6">
-            <Button variant="outline" size="lg" className="bg-blue-500 text-white hover:bg-blue-600">
-              <Facebook className="h-5 w-5 mr-2" /> Facebook
-            </Button>
-            <Button variant="outline" size="lg" className="bg-sky-400 text-white hover:bg-sky-500">
-              <Twitter className="h-5 w-5 mr-2" /> Twitter
-            </Button>
-            <Button variant="outline" size="lg" className="bg-pink-600 text-white hover:bg-pink-700">
-              <Instagram className="h-5 w-5 mr-2" /> Instagram
-            </Button>
+            {[
+              { icon: Facebook, label: "Facebook", bgColor: "bg-blue-500", hoverColor: "hover:bg-blue-600" },
+              { icon: Twitter, label: "Twitter", bgColor: "bg-sky-400", hoverColor: "hover:bg-sky-500" },
+              { icon: Instagram, label: "Instagram", bgColor: "bg-pink-600", hoverColor: "hover:bg-pink-700" },
+            ].map((social, index) => (
+              <motion.div
+                key={social.label}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className={`${social.bgColor} text-white ${social.hoverColor} transition-all duration-300`}
+                >
+                  <social.icon className="h-5 w-5 mr-2" /> {social.label}
+                </Button>
+              </motion.div>
+            ))}
           </div>
         </motion.footer>
       </div>
